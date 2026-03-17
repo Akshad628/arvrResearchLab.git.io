@@ -1,30 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { initializeApp } from 'firebase/app';
-import {
-  getAuth,
-  signInAnonymously,
-  signInWithCustomToken,
-  onAuthStateChanged
-} from 'firebase/auth';
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot,
-  serverTimestamp
-} from 'firebase/firestore';
+
 import {
   Home, Briefcase, Calendar, Terminal, Users, Clock, Menu, X,
   ChevronRight, ChevronLeft, Instagram, Linkedin, Code, Layers,
   Award, BookOpen, Globe, Monitor, Send, CheckCircle2, AlertCircle
 } from 'lucide-react';
 
-// --- Firebase Initialization ---
-const firebaseConfig = JSON.parse(__firebase_config);
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'wandel-reality-lab';
+
 
 /**
  * Reusable 3D Flip Card Component
@@ -81,7 +63,7 @@ const FlipCard = ({ item, color = 'cyan' }) => {
 };
 
 export default function App() {
-  const [user, setUser] = useState(null);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [activeEventTab, setActiveEventTab] = useState('conducted');
@@ -111,18 +93,7 @@ export default function App() {
     ]
   };
 
-  useEffect(() => {
-    const initAuth = async () => {
-      if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-        await signInWithCustomToken(auth, __initial_auth_token);
-      } else {
-        await signInAnonymously(auth);
-      }
-    };
-    initAuth();
-    const unsubscribe = onAuthStateChanged(auth, setUser);
-    return () => unsubscribe();
-  }, []);
+
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -178,26 +149,14 @@ export default function App() {
 
   const handleBooking = async (e) => {
     e.preventDefault();
-    if (!user) return;
     setBookingStatus({ loading: true, success: false });
-    const formData = new FormData(e.target);
-    const booking = {
-      fullName: formData.get('fullName'),
-      branch: formData.get('branch'),
-      agenda: formData.get('agenda'),
-      date: formData.get('date'),
-      time: formData.get('time'),
-      createdAt: serverTimestamp(),
-      userId: user.uid
-    };
-    try {
-      await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), booking);
+    
+    // Simulate API call success
+    setTimeout(() => {
       setBookingStatus({ loading: false, success: true });
       e.target.reset();
       setTimeout(() => setBookingStatus({ loading: false, success: false }), 5000);
-    } catch (err) {
-      setBookingStatus({ loading: false, success: false });
-    }
+    }, 1000);
   };
 
   if (isLoading) {
